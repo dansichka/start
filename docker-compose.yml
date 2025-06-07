@@ -12,6 +12,8 @@ services:
   memory:
     image: mcp/memory:latest
     container_name: memory
+    # The mcp/memory image only communicates over STDIN. It does not
+    # expose an HTTP API, so we keep stdin open and avoid port mapping.
     stdin_open: true
     volumes:
       - claude-memory:/app/dist

@@ -240,3 +240,16 @@ docker-compose up -d
 
 Agent Zero listens on `http://localhost:50080` and uses the memory
 container internally.
+
+### No HTTP Endpoint
+
+The `mcp/memory` image only speaks the MCP protocol over its standard
+input and output streams. It does **not** provide a built‑in HTTP API or
+listen on a network port. Attempting to expose port `4100` or to launch
+the container with `--transport http` will fail because those options do
+not exist in the current release.
+
+To interact with the memory data from other services, use one of the
+alternate servers shown above (e.g. `mcp/sqlite` with DuckDB or
+`mcp/neo4j-memory`) or implement a custom wrapper that proxies the
+STDIN‑based server over HTTP.
