@@ -1,0 +1,45 @@
+version: '3.9'
+
+volumes:
+  memory-sqlite:
+
+networks:
+  a0net: {}
+
+services:
+  memory:
+    image: mcp/sqlite:latest
+    container_name: memory-sqlite
+    stdin_open: true
+    volumes:
+      - memory-sqlite:/data
+    networks:
+      - a0net
+
+  duckdb:
+    image: duckdb/duckdb:latest
+    container_name: duckdb
+    command: ["duckdb", "--listen", "0.0.0.0:8000"]
+    volumes:
+      - memory-sqlite:/data:ro
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "duckdb", "--version"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - a0net
+
+  agent-zero:
+    image: frdel/agent-zero-run:v0.8.5
+    container_name: cranky_chaplygin
+    volumes:
+      - ./agent-zero:/a0
+    depends_on:
+      - memory
+    ports:
+      - "50080:80"
+    networks:
+      - a0net
