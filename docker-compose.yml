@@ -1,0 +1,47 @@
+# docker-compose.yml
+
+networks:
+  a0net: {}
+
+services:
+  memory:
+    image: mcp/memory:latest
+    container_name: memory
+    
+    # НЕ переопределяем entrypoint. Позволяем образу использовать свой собственный.
+    # Просто передаем ему нужные аргументы.
+    command:
+      - memory
+      - --transport
+      - http
+      - --port
+      - "4100"
+      
+    ports:
+      - "4100:4100"
+      
+    healthcheck:
+      # Эта команда проверит, отвечает ли порт 4100
+      test: ["CMD", "curl", "-f", "http://localhost:4100/health"]
+      interval: 15s         # Проверять каждые 15 секунд
+      timeout: 10s          # Ждать ответа 10 секунд
+      retries: 5            # 5 попыток перед тем, как считать сервис упавшим
+      start_period: 30s     # !!! КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: Дать контейнеру 30 секунд на запуск ПЕРЕД первой проверкой
+      
+    networks:
+      - a0net
+
+  agent-zero:
+    image: frdel/agent-zero-run:v0.8.5
+    container_name: cranky_chaplygin
+    volumes:
+      - ./agent-zero:/a0
+    ports:
+      - "50080:80"
+    depends_on:
+      memory:
+        condition: service_healthy
+    environment:
+      MEMORY_URL: http://memory:4100
+    networks:
+      - a0net
