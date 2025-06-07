@@ -1,5 +1,10 @@
 # docker-compose.yml
 
+version: '3.9'
+
+volumes:
+  claude-memory:
+
 networks:
   a0net: {}
 
@@ -7,27 +12,17 @@ services:
   memory:
     image: mcp/memory:latest
     container_name: memory
-    
-    # НЕ переопределяем entrypoint. Позволяем образу использовать свой собственный.
-    # Просто передаем ему нужные аргументы.
-    command:
-      - memory
-      - --transport
-      - http
-      - --port
-      - "4100"
-      
+    command: ["memory", "--transport", "http", "--port", "4100"]
     ports:
       - "4100:4100"
-      
     healthcheck:
-      # Эта команда проверит, отвечает ли порт 4100
       test: ["CMD", "curl", "-f", "http://localhost:4100/health"]
-      interval: 15s         # Проверять каждые 15 секунд
-      timeout: 10s          # Ждать ответа 10 секунд
-      retries: 5            # 5 попыток перед тем, как считать сервис упавшим
-      start_period: 30s     # !!! КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: Дать контейнеру 30 секунд на запуск ПЕРЕД первой проверкой
-      
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - claude-memory:/app/dist
     networks:
       - a0net
 
