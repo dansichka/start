@@ -18,6 +18,24 @@ services:
     networks:
       - a0net
 
+  memory-http:
+    image: httpd:2.4-alpine
+    container_name: memory-http
+    volumes:
+      - claude-memory:/usr/local/apache2/htdocs:ro
+    ports:
+      - "4100:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      memory:
+        condition: service_started
+    networks:
+      - a0net
+
   agent-zero:
     image: frdel/agent-zero-run:v0.8.5
     container_name: cranky_chaplygin

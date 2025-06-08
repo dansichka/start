@@ -6,9 +6,9 @@ communicates with Agent Zero via standard input and stores data in the
 Docker volume `claude-memory`.
 
 The examples below show how to expose the agent's memory to other
-systems using free, open‑source services like DuckDB, Qdrant and
-Neo4j.  Each scenario includes a dedicated compose file, health checks
-and environment variables required by Agent Zero.
+systems using free, open‑source services like DuckDB, Qdrant, Neo4j, or
+a simple HTTP server. Each scenario includes a dedicated compose file,
+health checks, and environment variables required by Agent Zero.
 
 ---
 
@@ -232,11 +232,15 @@ connect via Bolt or HTTP.
 
 For reference, the default configuration in this repository
 (`docker-compose.yml`) runs `mcp/memory` with its default stdio
-transport and stores data in the `claude-memory` volume.
+transport and stores data in the `claude-memory` volume.  A companion
+`httpd` container exposes this volume read‑only on port `4100` so other
+services can fetch the memory files over HTTP.
 
 ```bash
 docker-compose up -d
 ```
 
 Agent Zero listens on `http://localhost:50080` and communicates with the
-memory container directly via stdio.
+memory container directly via stdio. The `memory-http` service exposes
+the same volume on `http://localhost:4100/` so you can download the
+stored files.
