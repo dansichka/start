@@ -25,7 +25,7 @@ docker-compose -f docker-compose.duckdb.yml up -d
 
 ### docker-compose.duckdb.yml
 ```yaml
-version: '3.9'
+
 
 volumes:
   memory-sqlite:
@@ -90,7 +90,7 @@ docker-compose -f docker-compose.qdrant.yml up -d
 
 ### docker-compose.qdrant.yml
 ```yaml
-version: '3.9'
+
 
 volumes:
   memory-data:
@@ -167,7 +167,7 @@ docker-compose -f docker-compose.neo4j.yml up -d
 
 ### docker-compose.neo4j.yml
 ```yaml
-version: '3.9'
+
 
 volumes:
   neo4j-data:
@@ -244,3 +244,10 @@ Agent Zero listens on `http://localhost:50080` and communicates with the
 memory container directly via stdio. The `memory-http` service exposes
 the same volume on `http://localhost:4100/` so you can download the
 stored files.
+
+To verify everything is running:
+
+```bash
+docker compose ps
+curl http://localhost:4100/
+```
