@@ -250,3 +250,16 @@ Agent Zero listens on `http://localhost:50080` and communicates with the
 memory container directly via stdio. The `memory-http` service exposes
 the same volume on `http://localhost:4100/` so you can download the
 stored files.
+
+## Troubleshooting
+
+If Agent Zero fails to start with an error similar to:
+
+```
+ValidationError: 1 validation error for Settings
+instructions
+  Extra inputs are not permitted
+```
+
+make sure no environment variable named `INSTRUCTIONS` (or `FASTMCP_INSTRUCTIONS`) is set in your environment or `.env` file. These variables are not recognized by the built-in FastMCP server and will cause a validation error. Remove the variable or set it to an empty value before running `docker-compose up`.
+
