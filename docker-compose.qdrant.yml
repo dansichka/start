@@ -1,0 +1,56 @@
+version: '3.9'
+
+volumes:
+  memory-data:
+
+networks:
+  a0net: {}
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: qdrant
+    ports:
+      - "6333:6333"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/readyz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - a0net
+
+  memory:
+    image: mcp/basic-memory:latest
+    container_name: basic-memory
+    stdin_open: true
+    volumes:
+      - memory-data:/data
+    networks:
+      - a0net
+
+  qdrant-sync:
+    image: python:3.11-slim
+    container_name: qdrant-sync
+    command: ["python", "/sync/sync.py"]
+    volumes:
+      - memory-data:/memory
+    depends_on:
+      qdrant:
+        condition: service_healthy
+      memory:
+        condition: service_started
+    networks:
+      - a0net
+
+  agent-zero:
+    image: frdel/agent-zero-run:v0.8.5
+    container_name: cranky_chaplygin
+    volumes:
+      - ./agent-zero:/a0
+    depends_on:
+      - memory
+    ports:
+      - "50080:80"
+    networks:
+      - a0net

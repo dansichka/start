@@ -1,5 +1,10 @@
 # docker-compose.yml
 
+version: '3.9'
+
+volumes:
+  claude-memory:
+
 networks:
   a0net: {}
 
@@ -7,27 +12,31 @@ services:
   memory:
     image: mcp/memory:latest
     container_name: memory
-    
-    # НЕ переопределяем entrypoint. Позволяем образу использовать свой собственный.
-    # Просто передаем ему нужные аргументы.
-    command:
-      - memory
-      - --transport
-      - http
-      - --port
-      - "4100"
-      
+    # mcp/memory exposes only a stdio interface and has no built-in HTTP
+    # server. Keep STDIN open so Agent Zero can communicate with it.
+    stdin_open: true
+    volumes:
+      - claude-memory:/app/dist
+    networks:
+      - a0net
+
+  memory-http:
+    image: httpd:2.4-alpine
+    container_name: memory-http
+    # This lightweight web server simply exposes the memory volume
+    # read-only on http://localhost:4100/ for manual inspection.
+    volumes:
+      - claude-memory:/usr/local/apache2/htdocs:ro
     ports:
-      - "4100:4100"
-      
+      - "4100:80"
     healthcheck:
-      # Эта команда проверит, отвечает ли порт 4100
-      test: ["CMD", "curl", "-f", "http://localhost:4100/health"]
-      interval: 15s         # Проверять каждые 15 секунд
-      timeout: 10s          # Ждать ответа 10 секунд
-      retries: 5            # 5 попыток перед тем, как считать сервис упавшим
-      start_period: 30s     # !!! КЛЮЧЕВОЕ ИЗМЕНЕНИЕ: Дать контейнеру 30 секунд на запуск ПЕРЕД первой проверкой
-      
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      memory:
+        condition: service_started
     networks:
       - a0net
 
@@ -39,9 +48,6 @@ services:
     ports:
       - "50080:80"
     depends_on:
-      memory:
-        condition: service_healthy
-    environment:
-      MEMORY_URL: http://memory:4100
+      - memory
     networks:
       - a0net
