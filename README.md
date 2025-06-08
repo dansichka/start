@@ -1,8 +1,8 @@
 # Agent Zero Memory Alternatives
 
 This repository provides a sample `docker-compose.yml` for running
-`agent-zero` with the default `mcp/memory` server.  In this configuration
-the memory server listens on HTTP port `4100` and persists data in the
+`agent-zero` with the default `mcp/memory` server.  The memory container
+communicates with Agent Zero via standard input and stores data in the
 Docker volume `claude-memory`.
 
 The examples below show how to expose the agent's memory to other
@@ -231,12 +231,12 @@ connect via Bolt or HTTP.
 ## Default compose
 
 For reference, the default configuration in this repository
-(`docker-compose.yml`) runs `mcp/memory` with the HTTP transport on
-port `4100` and stores data in the `claude-memory` volume.
+(`docker-compose.yml`) runs `mcp/memory` with its default stdio
+transport and stores data in the `claude-memory` volume.
 
 ```bash
 docker-compose up -d
 ```
 
-Agent Zero listens on `http://localhost:50080` and talks to the memory
-service via HTTP.
+Agent Zero listens on `http://localhost:50080` and communicates with the
+memory container directly via stdio.

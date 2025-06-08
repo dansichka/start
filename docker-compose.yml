@@ -12,15 +12,7 @@ services:
   memory:
     image: mcp/memory:latest
     container_name: memory
-    command: ["memory", "--transport", "http", "--port", "4100"]
-    ports:
-      - "4100:4100"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4100/health"]
-      interval: 15s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
+    stdin_open: true
     volumes:
       - claude-memory:/app/dist
     networks:
@@ -34,9 +26,6 @@ services:
     ports:
       - "50080:80"
     depends_on:
-      memory:
-        condition: service_healthy
-    environment:
-      MEMORY_URL: http://memory:4100
+      - memory
     networks:
       - a0net
