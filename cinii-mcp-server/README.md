@@ -17,8 +17,9 @@ This module exposes a small [FastAPI](https://fastapi.tiangolo.com/) service tha
    export CII_APPID=your_api_key
    ```
 
-3. Run the service with `uvicorn`:
+3. Add the `src` directory to `PYTHONPATH` and run the service with `uvicorn`:
    ```bash
+   export PYTHONPATH=./src  # on Windows use: set PYTHONPATH=src
    uvicorn cinii_mcp_server.main:app --reload
    ```
 
