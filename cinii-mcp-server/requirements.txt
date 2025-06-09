@@ -1,0 +1,5 @@
+fastapi
+httpx
+uvicorn
+mcp-server==0.1.0
+pydantic
