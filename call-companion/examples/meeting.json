@@ -1,0 +1,9 @@
+{
+  "id": "demo-orion",
+  "title": "Статус Orion",
+  "agenda": "Сроки и бюджет этапа 1",
+  "attendees": [
+    {"name": "Олена Коваленко", "org": "Acme Logistics"},
+    {"name": "Max Weber"}
+  ]
+}
