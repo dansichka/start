@@ -240,3 +240,9 @@ docker-compose up -d
 
 Agent Zero listens on `http://localhost:50080` and uses the memory
 container internally.
+
+---
+
+## Call Companion
+
+В папке [`call-companion/`](call-companion/) лежит живой компаньон для созвонов: слушает разговор на MacBook, достаёт контекст из локального kernel и подсказывает в HUD. Он не связан с Agent Zero выше. Описание, быстрый старт и настройка: [`call-companion/README.md`](call-companion/README.md).

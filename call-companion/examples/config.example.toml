@@ -1,0 +1,65 @@
+# Скопируйте в ~/.config/callcompanion/config.toml. Все ключи необязательны, ниже значения по умолчанию.
+
+[user]
+name = "Даня"                   # как вас называют в разговоре; по имени понятно, что вопрос адресован вам
+aliases = ["Данил", "Daniil"]   # другие формы имени (склонения подбираются сами)
+language = "auto"               # язык подсказок: ru | uk | en | auto (как в звонке)
+
+[llm]
+model = "claude-opus-5-5"       # для минимальной задержки можно взять claude-haiku-4-5
+effort = "low"                  # глубина размышления: low | medium | high | xhigh | max
+max_tokens = 1024
+timeout_s = 20
+summary_model = "claude-opus-5-5"
+summary_effort = "medium"
+fallbacks = true                # серверный запасной ответ, если модель отказалась (beta, только для поддерживаемых моделей)
+
+[kernel]
+backends = ["snapshot", "http"] # чем читать kernel; snapshot работает и при выключенном ПК
+snapshot_path = "~/.callcompanion/pack.jsonl"
+search_budget_s = 0.9           # на живой запрос во время звонка отводится меньше секунды
+
+[kernel.http]
+base_url = "http://100.64.0.10:8765"   # адрес ПК с kernel в Tailscale или локальной сети
+token_env = "KERNEL_COMPANION_TOKEN"   # сам токен храните в переменной окружения, не здесь
+timeout_s = 0.8
+
+[kernel.cli]
+command = ["ssh", "pc", "kernel", "companion"]   # вариант без HTTP: вызывать CLI kernel по SSH
+
+[live]
+assist = "on_hesitation"        # always — отвечать сразу | on_hesitation — только если замялись | manual — только по запросу
+hesitation_s = 3.0              # сколько молчать после вопроса, прежде чем подсказывать
+max_whispers_per_min = 4
+min_gap_s = 8.0
+entity_cooldown_s = 120.0       # не повторять подсказку про одно и то же имя, пока тема жива
+multi_party_requires_name = true  # в групповом звонке реагировать на вопросы, где названо ваше имя
+
+[asr]
+engine = "mlx"                  # mlx (Apple Silicon) | faster (CPU/CUDA)
+model = "mlx-community/whisper-large-v3-turbo"   # на 8 ГБ ОЗУ: mlx-community/whisper-small-mlx
+language = "auto"               # ru | uk | en | auto
+
+[capture]
+backend = "sounddevice"         # sounddevice (BlackHole) | audiotap (нативный помощник)
+# mic_device = "MacBook Air Microphone"
+system_device = "BlackHole 2ch"
+audiotap_path = "~/.callcompanion/bin/audiotap"
+
+[ui]
+host = "127.0.0.1"              # для HUD на телефоне: адрес в Tailscale или "0.0.0.0"
+port = 7777
+# allowed_hosts = ["mac.local"] # имена, по которым вы открываете HUD (IP-адреса разрешены всегда)
+
+[privacy]
+mode = "client"                 # internal | client | interview | public: что можно показывать
+store_transcripts = false       # расшифровки на диск только если включите
+retention_days = 14
+redact = true                   # вычищать ключи, пароли, номера карт из всего, что уходит в модель и на экран
+# extra_redact_patterns = ["PROJ-\\d+"]
+
+[policy]
+auto_allow = []                 # действия уровня «запись», которые не требуют подтверждения; отправка писем сюда не попадает никогда
+approval_ttl_s = 1800
+# [policy.mode_limits]
+# client = "private"            # расширить, что видно в режиме client

@@ -1,0 +1,72 @@
+"""Regenerate sample_kernel_pack.jsonl: a fictional kernel export used by the demo and the tests.
+
+    python examples/make_demo_pack.py
+"""
+
+from datetime import datetime, timezone
+from pathlib import Path
+
+from call_companion.kernel_api import write_pack
+from call_companion.models import ContextItem, Entity
+
+
+def day(month: int, number: int) -> datetime:
+    return datetime(2026, month, number, 10, 0, tzinfo=timezone.utc)
+
+
+ITEMS = [
+    ContextItem(
+        id="tg:48211", source="telegram", kind="message", title="Олена Коваленко — сроки", ts=day(9, 12),
+        text="Олена написала 12.09: релиз интеграции Orion нужен до 15 октября, иначе срываем запуск на складе в Гамбурге. Готова обсудить поэтапную сдачу.",
+        entities=["Олена Коваленко", "Orion", "Acme Logistics"],
+    ),
+    ContextItem(
+        id="note:budget", source="note", kind="note", title="Договорённости по бюджету Orion", ts=day(9, 23),
+        text="Согласованный бюджет этапа 1 — 18 400 EUR, оплата 50/50. Этап 2 (аналитика) оценён в 9 200 EUR и не согласован.",
+        entities=["Orion", "Acme Logistics"],
+    ),
+    ContextItem(
+        id="gh:pr-214", source="github", kind="pr", title="PR #214: синхронизация заказов", ts=day(9, 28),
+        text="Webhook-синхронизация заказов смержена 28.09. Остался rate limit CRM: 60 запросов в минуту, нужен батчинг. На проде не гонялась.",
+        entities=["Orion"], url="https://github.com/example/orion/pull/214",
+    ),
+    ContextItem(
+        id="card:loop-17", source="kernel", kind="open_loop", title="Обещал Максу", ts=day(9, 29),
+        text="Обещал Максу Веберу прислать обновлённый план миграции данных до пятницы 03.10.",
+        entities=["Max Weber", "Orion"],
+    ),
+    ContextItem(
+        id="note:tp-1", source="note", kind="talking_point", title="Тезис для звонка", ts=day(9, 30),
+        text="Предложить поэтапную сдачу: ядро синхронизации до 15 октября, аналитика позже.",
+        entities=["Orion"],
+    ),
+    ContextItem(
+        id="cal:demo", source="calendar", kind="event", title="Демо Orion для Acme", ts=day(9, 30),
+        text="Демо запланировано на 8 октября, участвуют Олена и Макс.",
+        entities=["Олена Коваленко", "Max Weber", "Orion"],
+    ),
+    ContextItem(
+        id="drive:spec3", source="drive", kind="doc", title="Спека Orion v3", ts=day(9, 20),
+        text="SLA синхронизации — 5 минут, поддержка 3 складов, формат дат ДД.ММ.ГГГГ. Формат интеграции: webhook плюс ночная сверка.",
+        entities=["Orion"],
+    ),
+    ContextItem(
+        id="tg:private-77", source="telegram", kind="message", title="Личный чат", ts=day(9, 30),
+        text="Друг зовёт в отпуск в Грузию в ноябре.", sensitivity="private",
+    ),
+    ContextItem(
+        id="stripe:ch-9", source="stripe", kind="payment", title="Выплата", ts=day(9, 30),
+        text="Выплата 3 120 EUR на карту 4111 1111 1111 1111.", sensitivity="secret",
+    ),
+]
+
+ENTITIES = [
+    Entity(name="Orion", kind="project", aliases=["Орион"], summary="Интеграция CRM Acme со складскими системами"),
+    Entity(name="Acme Logistics", kind="org", aliases=["Acme", "Акме"]),
+    Entity(name="Олена Коваленко", kind="person", aliases=["Олена"]),
+    Entity(name="Max Weber", kind="person", aliases=["Макс Вебер", "Макс"]),
+]
+
+if __name__ == "__main__":
+    target = Path(__file__).with_name("sample_kernel_pack.jsonl")
+    print(f"{write_pack(target, ITEMS, ENTITIES)} строк -> {target}")

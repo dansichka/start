@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "call-companion"
+version = "0.1.0"
+description = "Живой компаньон для созвонов: слушает звонок, достаёт контекст из kernel и подсказывает в HUD"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic>=1.11",
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "httpx>=0.27",
+    "pydantic>=2.7",
+    "numpy>=1.26",
+    "rich>=13",
+    "psutil>=5.9",
+]
+
+[project.optional-dependencies]
+# Apple Silicon: whisper на Metal через MLX + запись звука + плавающее окно HUD
+mac = [
+    "mlx-whisper>=0.4",
+    "sounddevice>=0.4.7",
+    "pyobjc-framework-Cocoa>=10; sys_platform == 'darwin'",
+    "pywebview>=5; sys_platform == 'darwin'",
+]
+# Запасной вариант без MLX (CPU / CUDA)
+faster = ["faster-whisper>=1.0", "sounddevice>=0.4.7"]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "playwright>=1.45"]
+
+[project.scripts]
+callc = "call_companion.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/call_companion"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["src"]
+filterwarnings = ["ignore::DeprecationWarning", "error::pytest.PytestUnhandledThreadExceptionWarning"]
